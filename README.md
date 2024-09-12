@@ -1,76 +1,118 @@
-# Tetris Game - React App
+# Tetris Game - React App with CI/CD on Azure
 
-This project is a Tetris game built using [React](https://reactjs.org/). It was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project is a Tetris game built using [React](https://reactjs.org/) and deployed using a CI/CD pipeline with Azure, Docker, Kubernetes, and Terraform.
 
-## Project Overview
+## Prerequisites
 
-This Tetris game is designed to be deployed using a CI/CD pipeline with tools such as Jenkins, Docker, and Azure Kubernetes Service (AKS). The repository contains the code for the frontend game logic and setup scripts for deployment.
+Before starting, ensure you have the following installed:
 
-## Available Scripts
+- [Node.js](https://nodejs.org/) and npm
+- [Terraform](https://www.terraform.io/)
+- [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+- [Docker](https://www.docker.com/)
+- [Kubernetes CLI (kubectl)](https://kubernetes.io/docs/tasks/tools/)
+- [Jenkins](https://www.jenkins.io/) (optional for CI/CD automation)
 
-In the project directory, you can run the following commands:
+## Step-by-Step Setup and Deployment
 
-### `npm start`
+### 1. Clone the Repository
 
-Runs the app in development mode.  
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```
+git clone https://github.com/your-repo/tetris-game.git
+cd tetris-game
+```
+###  2. Install Node.js Dependencies
 
-- The page will automatically reload if you make edits.
-- You may also see lint errors in the console.
+In the project directory, run:
+```
+npm install
+```
+###  3. Run the App Locally
 
-### `npm test`
+Start the development server:
 
-Launches the test runner in interactive watch mode.  
-This is useful for running tests during development and ensuring code stability.
+```
+npm start
+```
+The app will be running at http://localhost:3000.
 
-### `npm run build`
+### 4. Build the Docker Image
 
-Builds the app for production in the `build` folder.  
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Create a Docker image for the React app:
 
-- The build is minified, and filenames include hashes.
-- The app is now ready to be deployed.
+```
+docker build -t tetris-game:latest .
+```
+### 5. Set Up Azure Resources
 
-### `npm run eject`
+#### 5.1. Log in to Azure
 
-**Note: This is a one-way operation. Once you `eject`, you can't undo it.**
+Log in to your Azure account using the Azure CLI:
+```
+az login
+```
+#### 5.2. Create a Resource Group
 
-If you need full control over the configuration (Webpack, Babel, ESLint, etc.), you can eject from Create React App by running this command. This is usually not necessary unless you require advanced customization.
+```
+az group create --name TetrisResourceGroup --location eastus
+```
+#### 5.3. Create an Azure Kubernetes Service (AKS) Cluster
 
-## Deployment
+```
+az aks create --resource-group TetrisResourceGroup --name TetrisAKSCluster --node-count 1 --enable-addons monitoring --generate-ssh-keys
+```
+#### 5.4. Connect to AKS
 
-This project is configured to be deployed using a CI/CD pipeline with Jenkins, Docker, and AKS. Here's a brief overview of how to deploy the app:
+Configure kubectl to connect to the AKS cluster:
 
-1. **Docker Build**: The React app is built and containerized using Docker.
-2. **CI/CD Pipeline**: Jenkins automates the testing, building, and deployment process.
-3. **Kubernetes Deployment**: The app is deployed to an Azure Kubernetes Service (AKS) cluster.
-4. **Public Access**: The app is made accessible via a LoadBalancer service in Kubernetes.
+```
+az aks get-credentials --resource-group TetrisResourceGroup --name TetrisAKSCluster
+```
 
-For detailed deployment instructions, refer to the deployment scripts in the `deployment/` directory.
+### 6. Use Terraform to Provision Infrastructure
+#### 6.1. Initialize Terraform
+Go to the deployment/ directory and initialize Terraform:
+```
+cd deployment
+terraform init
+```
 
-## Continuous Integration & Continuous Deployment (CI/CD)
+#### 6.2. Apply Terraform Configuration
+Run Terraform to provision the Azure infrastructure:
+```
+terraform apply
+```
 
-This project uses Jenkins and Docker to automate the following:
+### 7. Deploy the App to Kubernetes
 
-- **Build the app** using `npm run build`.
-- **Run tests** to ensure code quality.
-- **Containerize the app** into a Docker image.
-- **Deploy the app** to AKS via Kubernetes and ArgoCD.
+#### 7.1. Apply Kubernetes Deployment
 
-### Learn More
+Use kubectl to apply the Kubernetes configuration for deploying the Tetris game:
+```
+kubectl apply -f kubernetes-deployment.yaml
+```
 
-To learn more about Create React App, check out the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+#### 7.2. Check Kubernetes Pods and Services
 
-To learn more about React, check out the [React documentation](https://reactjs.org/).
+Verify the pods and services are running:
+```
+kubectl get pods
+```
 
-## Advanced Features
+### 8. Access the App
+Once the Kubernetes service is running, access the app using the external IP of the LoadBalancer:
+```
+kubectl get svc
+```
 
-- **Code Splitting**: The app can be optimized for performance with code splitting.
-- **Progressive Web App (PWA)**: Create React App provides tools to make the app a PWA.
-- **Analyzing Bundle Size**: Use tools to analyze the size of the final build.
-- **Custom Configuration**: You can customize the app by ejecting from Create React App, though this is not generally recommended.
+Navigate to the external IP in your browser to view the deployed Tetris game.
 
-## Troubleshooting
+For Terraform issues, re-run the following:
+```
+terraform apply
+```
 
-If you encounter any issues with building the app, visit the [Create React App troubleshooting guide](https://facebook.github.io/create-react-app/docs/troubleshooting).
+This guide provides a step-by-step approach to configuring and deploying the Tetris game using CI/CD tools.
+
+
 
