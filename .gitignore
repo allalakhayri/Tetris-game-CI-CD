@@ -44,6 +44,9 @@ logs/
 # dotenv environment variables file
 .env
 
+*.tfstate
+*.tfstate.*
+
 # Parcel cache
 .cache
 
