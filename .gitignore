@@ -5,6 +5,7 @@ node_modules/
 .pnp
 .pnp.js
 deployment/.terraform/
+deployment/terraform.tfstate
 
 # testing
 coverage/                 # Exclude test coverage files
